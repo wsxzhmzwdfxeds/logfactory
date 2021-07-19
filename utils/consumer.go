@@ -8,6 +8,10 @@ import (
 	"log"
 )
 
+var (
+	LOGSOURCE = "logsource"
+)
+
 type Consumer struct {
 	Ready chan bool
 }
@@ -39,8 +43,14 @@ func (consumer *Consumer) ConsumeClaim(session sarama.ConsumerGroupSession, clai
 			fmt.Printf("log format error, can not be unamrsha to map : %v\n", err)
 		}
 
-		ProcessLog(dat["hostIp"].(string), dat)
-
+		hostname, ok := dat[LOGSOURCE]
+		//hostname, ok := dat["host"]
+		if ok {
+			ProcessLog(hostname.(string), dat)
+		} else {
+			fmt.Println("logsource not exists.")
+		}
+		fmt.Printf("-----%v", dat)
 		ld := LogData{
 			Data: dat,
 			//Data:  string(message.Value),
